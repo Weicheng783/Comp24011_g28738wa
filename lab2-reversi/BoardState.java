@@ -58,7 +58,6 @@ public class BoardState {
             for(int j= 0; j < 8; j++)
                 if(checkLegalMove(i,j))
                     ans.add(new Move(i,j));
-        System.out.println(ans);
        return ans;       
    }
     
@@ -147,7 +146,10 @@ public class BoardState {
                 setContents(i,j, colour); 
         colour= -colour;                         // Change player
         
-        
+        // System.out.print(x);
+        // System.out.print(" y:");
+        // System.out.print(y);
+        // System.out.print("\n");
         // Now the computer moves 
         
     }
