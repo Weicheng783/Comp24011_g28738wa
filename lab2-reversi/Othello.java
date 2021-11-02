@@ -10,7 +10,7 @@ public class Othello {
     public static final int yBOARDpos= 100;   // Position of board
     public static final int xMARGIN= 50;   // Position of board
     public static final int yMARGIN= 50;   // Position of board
-    public static final int searchDepth= 2;   // Depth of minimax search
+    public static final int searchDepth= 8;   // Depth of minimax search
     
 
     
