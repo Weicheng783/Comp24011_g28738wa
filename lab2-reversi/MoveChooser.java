@@ -10,7 +10,7 @@ public class MoveChooser {
 		}
         // return moves.get(0);
         // We comment out the original method and put a very small or very large value in alpha and beta respectively.
-        int[] ress = minimax(moves,searchDepth,boardState, -99999999, 99999999);
+        int[] ress = minimax(moves,searchDepth,boardState,-99999999,99999999);
         if(ress.length != 0){
         	return moves.get(ress[3]);
         }else{
@@ -33,6 +33,11 @@ public class MoveChooser {
                     white += staticEvaluationMapping[i][j];
                 else if(bs.getContents(i,j)==-1)
                     black += staticEvaluationMapping[i][j];
+        if(bs.colour == 1){
+        	white += staticEvaluationMapping[x][y];
+        }else{
+        	black += staticEvaluationMapping[x][y];
+        }
         int result = white - black;
         return result;
     }
@@ -50,6 +55,7 @@ public class MoveChooser {
     	if(depth == 0){
     		if(moveList != null || moveList.size() != 0){
 	    		if(moveList == null){
+	    			// System.out.println("moveList is null.");
 	    			return null;
 	    		}
 	    		try{
@@ -61,12 +67,16 @@ public class MoveChooser {
 		    			int[] init = {staticEvaluation(bs,moveList.get(0).x,moveList.get(0).y),moveList.get(0).x,moveList.get(0).y,0,alpha};
 		    			for(int i=1; i<moveList.size(); i++){
 		    				if(alpha < beta){
+		    					// System.out.println("alpha: "+alpha+" beta: "+beta+" tempval: "+tempval+" Static Eva: "+staticEvaluation(bs,moveList.get(i).x,moveList.get(i).y));
 			    				if(staticEvaluation(bs,moveList.get(i).x,moveList.get(i).y) > tempval){
+			    					// System.out.println("tempval: "+tempval);
 			    					tempval = staticEvaluation(bs,moveList.get(i).x,moveList.get(i).y);
 			    					alpha = Math.max(alpha,tempval);
+			    					// System.out.println("tempval: "+tempval+" alpha: " + alpha);
 			    					init = new int[] {staticEvaluation(bs,moveList.get(i).x,moveList.get(i).y),moveList.get(i).x,moveList.get(i).y,i,alpha};
-			    				}					
+			    				}
 		    				}else{
+		    					// System.out.println("Break!");
 		    					break;
 		    				}
 		    			}
@@ -91,6 +101,7 @@ public class MoveChooser {
 		    			return init;	    			
 		    		}
 		    	}catch(Exception e){
+		    		// System.out.println("cannot access.");
 		    		return null;
 		    	}
     		}else{
@@ -117,9 +128,11 @@ public class MoveChooser {
 					candidates = Arrays.copyOf(candidates,candidates.length+1);
 					// Return int array based on at minimizing/maximizing node.
 					if(bs.colour == 1){
+						// System.out.println("white move null.");
 						int[] res = {staticEvaluation(bs,moveList.get(i).x,moveList.get(i).y),moveList.get(i).x,moveList.get(i).y,i,alpha};
 						candidates[i] = res;
 					}else{
+						// System.out.println("black move null.");
 						int[] res = {staticEvaluation(bs,moveList.get(i).x,moveList.get(i).y),moveList.get(i).x,moveList.get(i).y,i,beta};
 						candidates[i] = res;
 					}
@@ -135,9 +148,13 @@ public class MoveChooser {
 							// Since res[4] represents the returned alpha/beta value,
 							// we compare this value with the alpha/beta according to its node type.
 							// And then update it if possible.
+							// System.out.println("alpha: "+alpha+" res: "+res[4]);
+							// System.out.println("white move.");
 							alpha = Math.max(alpha, res[4]);
 							res[4] = alpha;
 						}else{
+							// System.out.println("beta: "+beta+" res: "+res[4]);
+							// System.out.println("black move.");
 							beta = Math.min(beta, res[4]);
 							res[4] = beta;
 						}
@@ -145,6 +162,7 @@ public class MoveChooser {
 					}				
 				}
 			}else{
+				// System.out.println("break! alpha: "+ alpha + " beta: " + beta);
 				break;
 			}		
 		}
