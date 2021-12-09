@@ -31,20 +31,22 @@ def featureMatching(image_ref, image_cur, matching_algorithm, threshold_value, o
 
     # Task 2: Feature Matching for each of matching_algorithm specified
     if(matching_algorithm == MATCHING_DIST_THRESHOLD):
+    	# Distance Thresholding: Return all points within the range.
         # Create BFMatcher object
         bf = cv2.BFMatcher()
         # Match descriptors.
-        matches = bf.knnMatch(desg,desgg,k=2)
+        matches = bf.knnMatch(desg,desgg,k=kMinNumFeature)
         result = []
         for i in range(len(matches)):
             for j in range(len(matches[i])):
-                if(threshold_value == None or threshold_value == 0):
+                if(threshold_value == None or threshold_value < 30):
                     threshold_value = 100
                 if(matches[i][j].distance <= threshold_value):
                     result.append(matches[i][j])
                 else:
                     pass
     elif(matching_algorithm == MATCHING_NN):
+    	# Nearest Neighbour: Return the best match for each descriptor.
         # Create BFMatcher object
         bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
         # Match descriptors.
@@ -53,7 +55,7 @@ def featureMatching(image_ref, image_cur, matching_algorithm, threshold_value, o
         matches = sorted(matches, key = lambda x:x.distance)
         result = []
         # Select qualified matches within this threshold.
-        if(threshold_value == None or threshold_value <= 10):
+        if(threshold_value == None or threshold_value < 30):
             threshold_value = 100
         for i in range(len(matches)):
             if(matches[i].distance <= threshold_value):
@@ -61,17 +63,32 @@ def featureMatching(image_ref, image_cur, matching_algorithm, threshold_value, o
             else:
                 break
     elif(matching_algorithm == MATCHING_NNDR):
+    	# Nearest Neighbour Distance Ratio: Return the best match and filter them by comparing with 2nd Nearest Neighbour,
+    	# the resulting ratio is the similarity: the lower, the better.
         # Create BFMatcher object
         bf = cv2.BFMatcher()
-        # Match descriptors.
+        # Match descriptors
         matches = bf.knnMatch(desg,desgg, k=2)
         result = []
-        if(threshold_value == None or threshold_value > 1 or threshold_value <= 0):
+        if(threshold_value == None or threshold_value > 1 or threshold_value <= 0.1):
             threshold_value = 0.70
         for m,n in matches:
             if m.distance < threshold_value*n.distance:
                 result.append(m)
-
+    else: # This is Safety Branch for bad algorithm input given by users, default to DT method.
+        # Create BFMatcher object
+        bf = cv2.BFMatcher()
+        # Match descriptors.
+        matches = bf.knnMatch(desg,desgg,k=2)
+        result = []
+        for i in range(len(matches)):
+            for j in range(len(matches[i])):
+                if(threshold_value == None or threshold_value < 30):
+                    threshold_value = 100
+                if(matches[i][j].distance <= threshold_value):
+                    result.append(matches[i][j])
+                else:
+                    pass
     # The following line will write the distance values of feature matches to an output file
     # Change the 1st parameter to the variable holding the feature matches obtained by your implementation
     printMatchesToFile(result, output_path)
